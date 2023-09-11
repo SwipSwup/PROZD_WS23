@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main() {
-    printf("35*42=%d\n", 35 * 42);
-    printf("3.5*4.2=%f", 3.5 * 4.2);
+    int i = 9;
+    printf("%d", i);
     return 0;
 }
