@@ -1,7 +1,11 @@
 #include <stdio.h>
 
 int main() {
-    int i = 9;
-    printf("%d", i);
+    int i, j;
+
+    scanf("%d", &i);
+    scanf("%d", &j);
+    
+    printf("%d", i * j);
     return 0;
 }
