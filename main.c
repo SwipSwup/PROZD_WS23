@@ -1,11 +1,9 @@
 #include <stdio.h>
 
 int main() {
-    int i, j;
+    char c[11];
+    scanf("%10s", &c[0]);
 
-    scanf("%d", &i);
-    scanf("%d", &j);
-    
-    printf("%d", i * j);
+    printf("%s", c);
     return 0;
 }
