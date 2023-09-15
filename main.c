@@ -5,12 +5,21 @@ int main() {
 
     scanf("%d", &i);
 
-    if(i < 0 || i > 100) {
-        printf("Ungültige Punktezahl");
+    if (i < 0 || i > 100) {
+        printf("Ungueltige Punktezahl");
         return 0;
     }
 
-    printf("Gültige Punktezahl\n");
-    printf(i >= 50 ? "Positive Note" : "Negative Note");
+    if (i > 90)
+        printf("Sehr gut");
+    else if (i > 76)
+        printf("Gut");
+    else if (i > 63)
+        printf("Befriedigend");
+    else if (i >= 50)
+        printf("Genuegend");
+    else
+        printf("Nicht genuegend");
+
     return 0;
 }
