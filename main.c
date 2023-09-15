@@ -1,14 +1,10 @@
 #include <stdio.h>
 
 int main() {
-    int x, y;
+    int i;
 
-    scanf("%d", &x);
-    scanf("%d", &y);
-
-    printf("%d\n",  x > 0 && x < y);
-    printf("%d\n",  x == y || y < 0);
-    printf("%d\n",  (!x || !y) && x != y);
+    scanf("%d", &i);
+    printf(i == 42 ? "Korrekt" : "Falsch");
 
     return 0;
 }
