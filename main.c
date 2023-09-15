@@ -2,24 +2,27 @@
 
 int main() {
     int i;
-
     scanf("%d", &i);
 
-    if (i < 0 || i > 100) {
-        printf("Ungueltige Punktezahl");
-        return 0;
+    switch(i) {
+        case 1:
+            printf("Sehr gut");
+            break;
+        case 2:
+            printf("Gut");
+            break;
+        case 3:
+            printf("Befriedigend");
+            break;
+        case 4:
+            printf("Genuegend");
+            break;
+        case 5:
+            printf("Nicht genuegend");
+            break;
+        default:
+            printf("Ungueltige Note");
     }
-
-    if (i > 90)
-        printf("Sehr gut");
-    else if (i > 76)
-        printf("Gut");
-    else if (i > 63)
-        printf("Befriedigend");
-    else if (i >= 50)
-        printf("Genuegend");
-    else
-        printf("Nicht genuegend");
 
     return 0;
 }
