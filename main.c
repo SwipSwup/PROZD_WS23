@@ -8,7 +8,7 @@ int main() {
     printf("24h time: 12h time: ");
 
     if (!hour) {
-        printf("12:%c%c AM", time24[0], time24[1]);
+        printf("12:%s AM", time24);
         return 0;
     }
 
@@ -17,7 +17,7 @@ int main() {
         return 0;
     }
 
-    printf("%2d:%c%c %s", hour - 12, time24[0], time24[1], hour == 24 ? "AM" : "PM");
+    printf("%2d:%s %s", hour - 12, time24, hour == 24 ? "AM" : "PM");
     return 0;
 }
 
