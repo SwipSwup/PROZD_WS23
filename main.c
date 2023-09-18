@@ -1,23 +1,22 @@
 #include <stdio.h>
 
 int main() {
-    char time24[3];
-    int hour;
-    scanf("%2d:%2s", &hour, &time24[0]);
+    int hour, minute;
+    scanf("%2d:%2d", &hour, &minute);
 
     printf("24h time: 12h time: ");
 
     if (!hour) {
-        printf("12:%s AM", time24);
+        printf("12:%d AM", minute);
         return 0;
     }
 
     if(hour < 13) {
-        printf("%d:%s %s", hour, time24, hour < 12 ? "AM" : "PM");
+        printf("%d:%d %s", hour, minute, hour < 12 ? "AM" : "PM");
         return 0;
     }
 
-    printf("%2d:%s %s", hour - 12, time24, hour == 24 ? "AM" : "PM");
+    printf("%2d:%d %s", hour - 12, minute, hour == 24 ? "AM" : "PM");
     return 0;
 }
 
