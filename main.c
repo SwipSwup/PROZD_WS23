@@ -13,8 +13,8 @@ int main() {
             max = n[i];
     }
 
-    printf(": minimum sum: %d\n", n[1] + n[2] + n[3] + min);
-    printf("maximum sum: %d", n[1] + n[2] + n[3] + max);
+    printf(": minimum sum: %d\n", n[0] + n[1] + n[2] + n[3] + n[4] - max);
+    printf("maximum sum: %d", n[0] + n[1] + n[2] + n[3] + n[4] - min);
 
     return 0;
 }
