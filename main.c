@@ -1,6 +1,10 @@
 #include <stdio.h>
 
 int main() {
-    printf("Hello, World!\n");
+    int i = 1;
+    while(i <= 20) {
+        printf("%d ", i);
+        ++i;
+    }
     return 0;
 }
