@@ -1,16 +1,8 @@
 #include <stdio.h>
 
 int main() {
-    int i;
-
-    while(1) {
-        scanf("%d", &i);
-        if(i >= 10) {
-            printf("Abbruch");
-            break;
-        }
-
-        printf("%d\n", i);
+    for (int i = 1; i <= 20; i++) {
+        printf("%d ", i);
     }
     return 0;
 }
