@@ -1,7 +1,9 @@
 #include <stdio.h>
 
 int main() {
-    int i = 1;
+    int i;
+    scanf("%d", &i);
+
     while(i <= 20) {
         printf("%d ", i);
         ++i;
