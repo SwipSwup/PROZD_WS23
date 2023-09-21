@@ -2,11 +2,15 @@
 
 int main() {
     int i;
-    scanf("%d", &i);
 
-    while(i <= 20) {
-        printf("%d ", i);
-        ++i;
+    while(1) {
+        scanf("%d", &i);
+        if(i >= 10) {
+            printf("Abbruch");
+            break;
+        }
+
+        printf("%d\n", i);
     }
     return 0;
 }
