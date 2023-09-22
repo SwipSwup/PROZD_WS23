@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include "math.h"
 
 int convert(int in, int base) {
-    return in % 10 + (in / 10) % 10 * base + (in / 100) % 10 * pow(base, 2);
+    return in % 10 + (in / 10) % 10 * base + (in / 100) % 10 * base * base;
 }
 
 int main() {
