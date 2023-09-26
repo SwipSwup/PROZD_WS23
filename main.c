@@ -3,29 +3,25 @@
 int main() {
     int input;
     int grades[3];
-    int gSum = 0;
 
     printf("Noten: ");
     scanf("%d", &input);
 
-    if (input / 1000) {
-        printf("Erwarte genau 3 Noten!");
-        return 0;
-    }
-
-    for (int i = 0; i < 3; ++i) {
-        grades[i] = input % 10;
-        input /= 10;
-
-        if(input == 0) {
+    for (int i = 0; i < 4; ++i) {
+        if((i != 3 && !input) || (i == 3 && input)) {
             printf("Erwarte genau 3 Noten!");
             return 0;
         }
+
+        if(i != 3) {
+            grades[2 - i] = input % 10;
+            input /= 10;
+        }
     }
 
+    int gSum = 0;
     for (int i = 0; i < 3; ++i) {
         if (grades[i] < 1 || grades[i] > 5) {
-
             switch (i) {
                 case 0:
                     printf("Erste Note muss zwischen 1 und 5 liegen!");
