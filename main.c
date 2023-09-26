@@ -15,7 +15,7 @@ int main() {
         if(i < startingDayIndex - 1)
             printf("   ");
         else
-            printf("%2d ", i - startingDayIndex);
+            printf("%2d ", i + 1 - startingDayIndex - 1);
     }
 
     return 0;
