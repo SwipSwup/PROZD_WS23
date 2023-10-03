@@ -4,7 +4,7 @@ void taxFree(double value);
 
 void taxBound(double value);
 
-void expense(double value);
+int expense(double value);
 
 static double credit = 100, expenses = 0, earnings = 0, totalTax = 0;
 
@@ -16,20 +16,21 @@ int main() {
     while (1) {
         printf("\nGuthaben: %.2lf Euro\n", credit);
         printf("Typ: ");
-        scanf("%c", &type);
+        scanf(" %c", &type);
         if (type == '=') {
             break;
         }
 
         printf("\nBetrag in Euro: ");
-        scanf("%lf", &value);
+        scanf(" %lf", &value);
         if (value < 0) {
-            printf("Der Betrag kann nicht negativ sein.\n");
+            printf("\nDer Betrag kann nicht negativ sein.");
             continue;
         }
 
         switch (type) {
             case 'e':
+                printf("\n");
                 taxBound(value);
                 numEarnings++;
                 break;
@@ -38,15 +39,17 @@ int main() {
                 numEarnings++;
                 break;
             case 'k':
-                expense(value);
-                numExpenses++;
+                if (expense(value))
+                    numExpenses++;
                 break;
         }
     }
 
     printf("\nRestguthaben: %.2lf Euro\n", credit);
-    printf("%d Einnahmen mit durchschnittlichem Wert %.2lf Euro\n", numEarnings, numEarnings == 0 ? 0 : earnings / numEarnings);
-    printf("%d Ausgaben mit durchschnittlichem Wert %.2lf Euro\n", numExpenses, numExpenses == 0 ? 0 : expenses / numExpenses);
+    printf("%d Einnahmen mit durchschnittlichem Wert %.2lf Euro\n", numEarnings,
+           numEarnings == 0 ? 0 : earnings / numEarnings);
+    printf("%d Ausgaben mit durchschnittlichem Wert %.2lf Euro\n", numExpenses,
+           numExpenses == 0 ? 0 : expenses / numExpenses);
     printf("Gezahlte Steuern: %.2lf Euro\n", totalTax);
 
     return 0;
@@ -63,11 +66,13 @@ void taxFree(double value) {
 void taxBound(double value) {
     if (value <= 20) {
         taxFree(value);
-        printf("Gezahlte Steuern: 0.00 Euro\n");
+        printf("Gezahlte Steuern: 0.00 Euro");
         return;
     }
 
     double tax = 0, tmp = value;
+    credit += value;
+    earnings += value;
 
     if (value > 200) {
         tax += (value - 200) * 0.4;
@@ -83,21 +88,22 @@ void taxBound(double value) {
         tax += (value - 20) * 0.1;
     }
 
-    printf("%lf", tmp);
+    //printf("%lf", tmp);
 
-    credit += tmp - tax;
-    earnings += tmp - tax;
+    credit -= tax;
+    earnings -= tax;
     totalTax += tax;
 
-    printf("Gezahlte Steuern: %.2lf Euro\n", tax);
+    printf("Gezahlte Steuern: %.2lf Euro", tax);
 }
 
-void expense(double value) {
+int expense(double value) {
     if (value > credit) {
-        printf("Diese Kosten koennen nicht bezahlt werden.\n");
-        return;
+        printf("\nDiese Kosten koennen nicht bezahlt werden.");
+        return 0;
     }
 
     credit -= value;
     expenses += value;
+    return 1;
 }
