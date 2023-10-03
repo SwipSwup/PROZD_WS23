@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#define INITIAL_CREDIT 100
+
 void taxFree(double value);
 
 void taxBound(double value);
@@ -8,7 +10,7 @@ int expense(double value);
 
 double getCredit();
 
-static double startCredit = 100, expenses = 0, earnings = 0, taxes = 0;
+static double expenses = 0, earnings = 0, taxes = 0;
 
 int main() {
     int numEarnings = 0, numExpenses = 0;
@@ -59,7 +61,7 @@ int main() {
 }
 
 double getCredit() {
-    return startCredit + earnings - expenses - taxes;
+    return INITIAL_CREDIT + earnings - expenses - taxes;
 }
 
 void taxFree(double value) {
