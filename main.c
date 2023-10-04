@@ -1,24 +1,21 @@
 #include <stdio.h>
 
 #define INITIAL_CREDIT 100
-
-void taxFree(double value);
-
-void taxBound(double value);
-
-int expense(double value);
-
-double getCredit();
+#define CREDIT (INITIAL_CREDIT + earnings - expenses - taxes)
 
 static double expenses = 0, earnings = 0, taxes = 0;
 
+void calcTaxes(double value);
+
+int expense(double value);
+
 int main() {
-    int numEarnings = 0, numExpenses = 0;
+    short cntEarnings = 0, cntExpenses = 0;
     double value;
     char type;
 
     while (1) {
-        printf("\nGuthaben: %.2lf Euro", getCredit());
+        printf("\nGuthaben: %.2lf Euro", CREDIT);
 
         printf("\nTyp: ");
         scanf(" %c", &type);
@@ -35,48 +32,30 @@ int main() {
 
         switch (type) {
             case 'e':
-                printf("\n");
-                taxBound(value);
-                numEarnings++;
-                break;
+                calcTaxes(value);
             case 's':
-                taxFree(value);
-                numEarnings++;
+                earnings += value;
+                cntEarnings++;
                 break;
             case 'k':
                 if (expense(value))
-                    numExpenses++;
+                    cntExpenses++;
                 break;
         }
     }
 
-    printf("\nRestguthaben: %.2lf Euro", getCredit());
-    printf("\n%d Einnahmen mit durchschnittlichem Wert %.2lf Euro", numEarnings,
-           numEarnings == 0 ? 0 : (earnings - taxes) / numEarnings);
-    printf("\n%d Ausgaben mit durchschnittlichem Wert %.2lf Euro", numExpenses,
-           numExpenses == 0 ? 0 : expenses / numExpenses);
+    printf("\nRestguthaben: %.2lf Euro", CREDIT);
+    printf("\n%d Einnahmen mit durchschnittlichem Wert %.2lf Euro", cntEarnings,
+           cntEarnings == 0 ? 0 : (earnings - taxes) / cntEarnings);
+    printf("\n%d Ausgaben mit durchschnittlichem Wert %.2lf Euro", cntExpenses,
+           cntExpenses == 0 ? 0 : expenses / cntExpenses);
     printf("\nGezahlte Steuern: %.2lf Euro", taxes);
 
     return 0;
 }
 
-double getCredit() {
-    return INITIAL_CREDIT + earnings - expenses - taxes;
-}
-
-void taxFree(double value) {
-    earnings += value;
-}
-
-void taxBound(double value) {
-    if (value <= 20) {
-        taxFree(value);
-        printf("Gezahlte Steuern: 0.00 Euro");
-        return;
-    }
-
+void calcTaxes(double value) {
     double tmpTax = 0;
-    earnings += value;
 
     if (value > 200) {
         tmpTax += (value - 200) * 0.4;
@@ -93,11 +72,11 @@ void taxBound(double value) {
     }
 
     taxes += tmpTax;
-    printf("Gezahlte Steuern: %.2lf Euro", tmpTax);
+    printf("\nGezahlte Steuern: %.2lf Euro", tmpTax);
 }
 
 int expense(double value) {
-    if (value > getCredit()) {
+    if (value > CREDIT) {
         printf("\nDiese Kosten koennen nicht bezahlt werden.");
         return 0;
     }
@@ -105,5 +84,3 @@ int expense(double value) {
     expenses += value;
     return 1;
 }
-
-
