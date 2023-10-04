@@ -3,7 +3,7 @@
 #define INITIAL_CREDIT 100
 #define CREDIT (INITIAL_CREDIT + earnings - expenses - taxes)
 
-static double expenses = 0, earnings = 0, taxes = 0;
+double expenses = 0, earnings = 0, taxes = 0;
 
 void calcTaxes(double value);
 
