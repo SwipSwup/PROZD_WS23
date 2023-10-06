@@ -17,12 +17,14 @@ int main() {
     while (1) {
         printf("\nGuthaben: %.2lf Euro", CREDIT);
 
+        //Eingabe des typen. Bricht die schleife ab wenn der type '=' ist.
         printf("\nTyp: ");
         scanf(" %c", &type);
         if (type == '=') {
             break;
         }
 
+        //Eingabe des Betrags. Wenn der Wert unter 0 ist wird die Eingabe wiederholt.
         printf("\nBetrag in Euro: ");
         scanf(" %lf", &value);
         if (value < 0) {
@@ -30,6 +32,7 @@ int main() {
             continue;
         }
 
+        //Abfrage der verschiedenen Typen.
         switch (type) {
             case 'e':
                 calcTaxes(value);
@@ -44,6 +47,7 @@ int main() {
         }
     }
 
+    //Gib die statistik aus
     printf("\nRestguthaben: %.2lf Euro", CREDIT);
     printf("\n%d Einnahmen mit durchschnittlichem Wert %.2lf Euro", cntEarnings,
            cntEarnings == 0 ? 0 : (earnings - taxes) / cntEarnings);
