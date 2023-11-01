@@ -9,27 +9,29 @@ struct node
     struct node* head;
 } typedef node;
 
-node* createNode(node* head)
+node* createNode(char* word, node* head)
 {
     node* newNode = (node*) malloc(sizeof(node));
     newNode->head = head == NULL ? NULL : head;
+    newNode->word = word;
+    newNode->count = 1;
     return newNode;
 }
 
-int size(node* list)
+int size(node* map)
 {
     int i = 0;
-    for (; list->head != NULL; i++, list = list->head);
+    for (; map->head != NULL; i++, map = map->head);
 
     return i;
 }
 
 
-node* getNode(int index, node* list)
+node* getNode(int index, node* map)
 {
-    node* node = list->head;
+    node* node = map->head;
 
-    if (index > size(list) || index < 0)
+    if (index > size(map) || index < 0)
     {
         return NULL;
     }
@@ -46,17 +48,37 @@ node* getNode(int index, node* list)
     return node;
 }
 
-void addNode(node* newNode, node* list)
+int nodeExists(char* word, node* map)
 {
-    if(list->head == NULL) {
-        list->head == newNode;
+    if (!strcmp(word, map->word))
+    {
+        return 1;
+    }
+
+    if (map->head == NULL)
+    {
+        return 0;
+    }
+
+    return nodeExists(word, map->head);
+}
+
+void updateNode()
+{
+
+}
+
+void addNode(node* newNode, node* map)
+{
+    if (map->head == NULL)
+    {
+        map->head = newNode;
         return;
     }
 
-    addNode(newNode, list->head);
+    addNode(newNode, map->head);
 }
 
-countWord
 
 char** scanWords()
 {
@@ -81,22 +103,49 @@ char** scanWords()
     return words;
 }
 
+int countWord(char* text, char* word)
+{
+    node* map = NULL;
+
+    char* nextWord = NULL;
+    for (int i = 0; text[i] != '\0'; ++i)
+    {
+        if (text[i] < 'a' || text[i] > 'z' || text[i] < 'A' || text[i] > 'Z')
+        {
+            if (nextWord == NULL)
+                continue;
+
+            if (nodeExists(word, map))
+            {
+                updateNode()
+            }
+            else
+            {
+                node* newNode = createNode(nextWord, map);
+
+                addNode()
+            }
+
+            nextWord == NULL;
+        }
+    }
+}
+
 
 int main()
 {
     char text[1001];
-    char** words = scanWords();
 
+    printf("text: ");
     scanf("%1000s", &text[0]);
 
-
+    printf("\nwords: ");
+    char** words = scanWords();
     for (int i = 0; strcmp(words[i], "") != 0; ++i)
     {
-        printf("%d ", strcmp(words[i], " "));
-        printf("%s ", words[i]);
+        printf("%s \n", words[i]);
 
     }
 
-    printf("Hello, World!\n");
     return 0;
 }
