@@ -1,30 +1,30 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+#include <ctype.h>
 
-
-
-int countWord(char* text, char* word)
+char* scanText()
 {
-    char tmp[strlen(text) + 1];
-    strcpy(tmp, text);
-    char* token = strtok(tmp, " ");
-    int count = 0;
+    char nextChar;
+    char* text = (char*) malloc(sizeof (char) * 1001);
+    int i = 0;
 
-    while (token != NULL)
+    while (1)
     {
-        //printf("token: %s\n", token);
-        //printf("word: %s\n", word);
-        //printf("string: %s\n", text);
-        if (strstr(token, word) != NULL)
+        scanf("%c", &nextChar);
+
+        if (nextChar == '\n' || i > 1000)
         {
-            count++;
+            break;
         }
 
-        token = strtok(NULL, " ");
+        if(isalpha(nextChar) || isspace(nextChar)) {
+            text[i++] = nextChar;
+        }
     }
 
-    return count;
+    text[i] = '\0';
+    return text;
 }
 
 char** scanWords()
@@ -50,6 +50,29 @@ char** scanWords()
     return words;
 }
 
+int countWord(char* text, char* word)
+{
+    char tmp[strlen(text) + 1];
+    strcpy(tmp, text);
+    char* token = strtok(tmp, " ");
+    int count = 0;
+
+    while (token != NULL)
+    {
+        //printf("token: %s\n", token);
+        //printf("word: %s\n", word);
+        //printf("string: %s\n", text);
+        if (strstr(token, word) != NULL)
+        {
+            count++;
+        }
+
+        token = strtok(NULL, " ");
+    }
+
+    return count;
+}
+
 void freeAll(char** strngs)
 {
     for (int i = 0; strcmp(strngs[i], "") != 0; ++i)
@@ -62,8 +85,7 @@ void freeAll(char** strngs)
 int main()
 {
     printf("text: ");
-    char text[1001];
-    fgets(text, sizeof(text), stdin);
+    char* text = scanText();
 
     printf("words: ");
     char** words = scanWords();
@@ -73,5 +95,6 @@ int main()
     }
 
     freeAll(words);
+    free(text);
     return 0;
 }
