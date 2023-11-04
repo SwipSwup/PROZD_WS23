@@ -62,9 +62,20 @@ int countWord(char* text, char* word)
         //printf("token: %s\n", token);
         //printf("word: %s\n", word);
         //printf("string: %s\n", text);
-        if (strstr(token, word) != NULL)
+        for (int i = 0, j = 0; token[i] != '\0'; ++i)
         {
-            count++;
+            if(token[i] != word[j]) {
+                j = 0;
+                continue;
+            }
+
+            if(j == strlen(word) - 1) {
+                j = 0;
+                count++;
+                continue;
+            }
+
+            j++;
         }
 
         token = strtok(NULL, " ");
@@ -75,17 +86,22 @@ int countWord(char* text, char* word)
 
 void freeAll(char** strngs)
 {
-    for (int i = 0; strcmp(strngs[i], "") != 0; ++i)
+    int i = 0;
+    while(strcmp(strngs[i], "") != 0)
     {
-        free(strngs[i]);
+        free(strngs[i++]);
     }
+    free(strngs[i]);
     free(strngs);
 }
 
+//Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.   Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+//Alice, Alicia, Bob, Bobby, and Charlie live in lovington.
 int main()
 {
     printf("text: ");
     char* text = scanText();
+    //printf("\ntext: %s", text);
 
     printf("words: ");
     char** words = scanWords();
