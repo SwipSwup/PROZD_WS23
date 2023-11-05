@@ -11,7 +11,7 @@ struct node
 
 node* createNode(char* name)
 {
-    node* newNode = (node*) malloc(sizeof(node*) );
+    node* newNode = (node*) malloc(sizeof(node));
     newNode->id = 0;
     newNode->name = (char*) malloc(strlen(name) + 1);
     strcpy(newNode->name, name);
@@ -48,8 +48,8 @@ void freeAll(node* list) {
         return;
     }
 
-    free(list->name);
     freeAll(list->head);
+    free(list->name);
     free(list);
 }
 
@@ -60,7 +60,7 @@ int main()
 
     while (1)
     {
-        scanf("%50s", &name[0]);
+        scanf("%50s", name);
 
         if (!strcmp(name, "exit"))
         {
