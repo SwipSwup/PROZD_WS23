@@ -20,6 +20,7 @@ struct appointment
     int duration;
 } typedef appointment;
 
+//Gibt für jeden appointmentType den zugehörigen string zurück
 char* getAppointmentTypeAsString(appointmentType type)
 {
     switch (type)
@@ -50,6 +51,7 @@ void printAppointments(struct appointment* schedule, int length)
 
 void printInformation(struct appointment* schedule, int length)
 {
+    //hilfsvariable um zu schauen, ob eine Terminkollision aufgetreten ist
     int hasCollided = 0;
 
     for (int i = 0; i < length - 1; ++i)
@@ -58,7 +60,6 @@ void printInformation(struct appointment* schedule, int length)
         {
             printf("\nEntweder Termin %d oder Termin %d sollte abgesagt werden.", i + 1, i + 2);
             hasCollided = 1;
-            break;
         }
     }
 
@@ -103,27 +104,38 @@ void printInformation(struct appointment* schedule, int length)
     );
 }
 
+//struct für die daten die beim Abfragen des user inputs notwendig sind
 struct userInputParams
 {
+    //Was für ein input man braucht z.B.: "%d" für int
     char* inputType;
+    //Die message die vorm abfragen ausgegeben werden soll
     char* message;
     //sollte nicht nötig sein aber die Angabe ist falsch und es muss einmal ohne "\n" ausgegeben werden
     char* errorMessage;
 
+    //die größe des speichers für die daten. Bei int sizeof(int)
     int bufferSize;
+    //extra daten die zum validieren benötigt werden
     void* validationData;
 } typedef userInputParams;
 
+//validiert einen type als character.
+//Bsp.: bei den appointment types dürfen nur die chars 'f' 'b' 'p' eingegeben werden. Die validation data wäre somit "fbp"
 int validateGenericTypeAsChar(const void* type, const void* types)
 {
     return strchr(types, *((char*) type)) != NULL;
 }
 
+//validiert, ob ein int sich zwischen zwei int befinden
+//Bsp.: bei den uhrzeiten dürfen nur zahlen zwischen 8 und 22 uhr eingegeben werden. Die validation data wäre somit ein int array mit 8 und 22
 int validateIntegerBoundsIncl(const void* number, const void* bounds)
 {
     return *((int*) number) >= ((int*) bounds)[0] && *((int*) number) <= ((int*) bounds)[1];
 }
 
+//eine generische funktion die user input parameter und eine validations funktion nimmt.
+//returned eine speicheradresse vom heap auf der sich die eingelesenen daten befinden
 void* getUserInputWithValidation(const userInputParams params, int validate(const void*, const void*))
 {
     void* buffer = malloc(params.bufferSize);
@@ -132,6 +144,7 @@ void* getUserInputWithValidation(const userInputParams params, int validate(cons
         printf("%s", params.message);
         scanf(params.inputType, buffer);
 
+        //ruft die validations funktion auf mit dem eingelesenen wert und den validation daten
         if (!validate(buffer, params.validationData))
         {
             printf("%s", params.errorMessage);
