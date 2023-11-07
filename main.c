@@ -3,6 +3,8 @@
 #include <malloc.h>
 
 #define SCHEDULE_LENGTH 10
+#define VALID_APPOINTMENT_TYPES "fbp"
+#define VALID_MENU_ACTIONS "ndlix"
 
 enum appointmentType
 {
@@ -46,16 +48,6 @@ void printAppointments(struct appointment* schedule, int length)
     }
 }
 
-int appointmentsCollideValidation(const appointment a, const appointment b)
-{
-    return a.time + a.duration > b.time;
-}
-
-int appointmentsConcurrentValidation(const appointment a, const appointment b)
-{
-    return a.time + a.duration < b.time;
-}
-
 void printInformation(struct appointment* schedule, int length)
 {
     int hasCollided = 0;
@@ -86,7 +78,6 @@ void printInformation(struct appointment* schedule, int length)
             );
         }
     }
-
 
     int friendAppointmentCnt = 0, businessAppointmentCnt = 0, pauseAppointmentCnt = 0;
     for (int i = 0; i < length; ++i)
@@ -160,7 +151,7 @@ appointment createAppointment()
                     "\nGib einen Typen ein: Freunde (f), Geschaeftlich (b), Pause (p): ",
                     "\nUngueltige Eingabe!",
                     sizeof(char),
-                    "fbp"
+                    VALID_APPOINTMENT_TYPES
             },
             validateGenericTypeAsChar
     );
@@ -258,7 +249,7 @@ enum menuAction
     DELETE_APPOINTMENT = 'd',
     LIST_SCHEDULE = 'l',
     INFO_SCHEDULE = 'i',
-    TERMINATE_PROGRAM = 'x'
+    EXIT_PROGRAM = 'x'
 } typedef menuAction;
 
 void programMenu(appointment* schedule, int* scheduleCount)
@@ -273,7 +264,7 @@ void programMenu(appointment* schedule, int* scheduleCount)
                         "\nNeuen Termin (n), Termin loeschen (d), Termine auflisten (l), Informationen ausgeben (i), Programm beenden (x)\nAuswahl: ",
                         "\nUngueltige Eingabe!",
                         sizeof(char),
-                        "ndlix"
+                        VALID_MENU_ACTIONS
                 },
                 validateGenericTypeAsChar
         );
@@ -292,7 +283,7 @@ void programMenu(appointment* schedule, int* scheduleCount)
             case INFO_SCHEDULE:
                 printInformation(schedule, *scheduleCount);
                 break;
-            case TERMINATE_PROGRAM:
+            case EXIT_PROGRAM:
                 free(userInputBuffer);
                 return;
         }
