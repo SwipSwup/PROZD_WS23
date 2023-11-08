@@ -2,10 +2,11 @@
 #include <string.h>
 #include <malloc.h>
 
-#define SCHEDULE_LENGTH 10
+#define MAX_SCHEDULE_LENGTH 10
 #define VALID_APPOINTMENT_TYPES "fbp"
 #define VALID_MENU_ACTIONS "ndlix"
 
+//enum für alle verschiedenen types an terminen mit ihren zugehörigen chars
 enum appointmentType
 {
     FRIENDS = 'f',
@@ -13,6 +14,7 @@ enum appointmentType
     PAUSE = 'p'
 } typedef appointmentType;
 
+//struct zum speicher der termin daten
 struct appointment
 {
     appointmentType type;
@@ -20,7 +22,7 @@ struct appointment
     int duration;
 } typedef appointment;
 
-//Gibt für jeden appointmentType den zugehörigen string zurück
+//gibt für jeden appointmentType den zugehörigen string zurück
 char* getAppointmentTypeAsString(appointmentType type)
 {
     switch (type)
@@ -33,7 +35,7 @@ char* getAppointmentTypeAsString(appointmentType type)
             return "Pause";
     }
 
-    return "";
+    return "(NULL)";
 }
 
 void printAppointments(struct appointment* schedule, int length)
@@ -54,6 +56,7 @@ void printInformation(struct appointment* schedule, int length)
     //hilfsvariable um zu schauen, ob eine Terminkollision aufgetreten ist
     int hasCollided = 0;
 
+    //loop durch das schedule um zu schauen, ob zwei termin kollidieren
     for (int i = 0; i < length - 1; ++i)
     {
         if (schedule[i].time + schedule[i].duration > schedule[i + 1].time)
@@ -114,7 +117,7 @@ struct userInputParams
     //sollte nicht nötig sein aber die Angabe ist falsch und es muss einmal ohne "\n" ausgegeben werden
     char* errorMessage;
 
-    //die größe des speichers für die daten. Bei int sizeof(int)
+    //die größe des speichers für die daten z.B.: sizeof(int) für int
     int bufferSize;
     //extra daten die zum validieren benötigt werden
     void* validationData;
@@ -124,7 +127,7 @@ struct userInputParams
 //Bsp.: bei den appointment types dürfen nur die chars 'f' 'b' 'p' eingegeben werden. Die validation data wäre somit "fbp"
 int validateGenericTypeAsChar(const void* type, const void* types)
 {
-    return strchr(types, *((char*) type)) != NULL;
+    return strchr((char*) types, *((char*) type)) != NULL;
 }
 
 //validiert, ob ein int sich zwischen zwei int befinden
@@ -145,12 +148,12 @@ void* getUserInputWithValidation(const userInputParams params, int validate(cons
         scanf(params.inputType, buffer);
 
         //ruft die validations funktion auf mit dem eingelesenen wert und den validation daten
-        if (!validate(buffer, params.validationData))
+        if (validate(buffer, params.validationData))
         {
-            printf("%s", params.errorMessage);
-            continue;
+            return buffer;
         }
-        return buffer;
+
+        printf("%s", params.errorMessage);
     }
 }
 
@@ -203,7 +206,7 @@ appointment createAppointment()
 
 void addAppointment(struct appointment* schedule, int* length)
 {
-    if (*length == 10)
+    if (*length == MAX_SCHEDULE_LENGTH)
     {
         printf("\nDer Kalender ist voll!");
         return;
@@ -305,7 +308,7 @@ void programMenu(appointment* schedule, int* scheduleCount)
 
 int main()
 {
-    appointment schedule[SCHEDULE_LENGTH];
+    appointment schedule[MAX_SCHEDULE_LENGTH];
     int scheduleCount = 0;
 
     programMenu(schedule, &scheduleCount);
