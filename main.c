@@ -56,8 +56,6 @@ void printInformation(struct appointment* schedule, int length)
     //hilfsvariable um zu schauen, ob eine Terminkollision aufgetreten ist
     int hasCollided = 0;
 
-    //TODO sollen alle kollidierenden Termine ausgegeben werden?
-    // Termin 1 = 3Std lang und kollidiert mit Termin 2 und Termin 3
     //loop durch das schedule um zu schauen, ob zwei termin kollidieren
     for (int i = 0; i < length - 1; ++i)
     {
