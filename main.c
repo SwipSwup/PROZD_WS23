@@ -38,6 +38,7 @@ char* getAppointmentTypeAsString(appointmentType type)
     return "(NULL)";
 }
 
+//looped durch das schedule und gibt alle appointments aus
 void printAppointments(struct appointment* schedule, int length)
 {
     for (int i = 0; i < length; ++i)
@@ -56,7 +57,8 @@ void printInformation(struct appointment* schedule, int length)
     //hilfsvariable um zu schauen, ob eine Terminkollision aufgetreten ist
     int hasCollided = 0;
 
-    //loop durch das schedule um zu schauen, ob zwei termin kollidieren
+    //looped durch das schedule und schaut ob der nächste termin mit dem bei i kollidiert. 
+    //Wenn ja, wird die hilfsvariable auf 1 gesetzt (true)  
     for (int i = 0; i < length - 1; ++i)
     {
         if (schedule[i].time + schedule[i].duration > schedule[i + 1].time)
@@ -66,23 +68,28 @@ void printInformation(struct appointment* schedule, int length)
         }
     }
 
+    //Wenn die hilfsvariable 0 (false) ist, wird ausgegeben das keine Kollision vorkam.
     if (!hasCollided)
     {
         printf("\nDer Kalender hat keine Kollisionen!");
     }
 
+    //looped durch das schedule und schaut, ob zwischen zwei hintereinanderliegende termine ungenutzte Zeit liegt.
     for (int i = 0; i < length - 1; ++i)
     {
+        //TODO
         if (schedule[i].time + schedule[i].duration < schedule[i + 1].time)
         {
             printf("\nZwischen den Terminen %d und %d liegen %dh ungeplante Zeit.",
                    i + 1,
                    i + 2,
+                   //TODO
                    schedule[i + 1].time - (schedule[i].time + schedule[i].duration)
             );
         }
     }
 
+    //Zählt die AppointmentTypes im Schedule
     int friendAppointmentCnt = 0, businessAppointmentCnt = 0, pauseAppointmentCnt = 0;
     for (int i = 0; i < length; ++i)
     {
@@ -118,7 +125,7 @@ struct userInputParams
     char* errorMessage;
 
     //die größe des speichers für die daten z.B.: sizeof(int) für int
-    int bufferSize;
+    int memSize;
     //extra daten die zum validieren benötigt werden
     void* validationData;
 } typedef userInputParams;
@@ -141,16 +148,16 @@ int validateIntegerBoundsIncl(const void* number, const void* bounds)
 //returned eine speicheradresse vom heap auf der sich die eingelesenen daten befinden
 void* getUserInputWithValidation(const userInputParams params, int validate(const void*, const void*))
 {
-    void* buffer = malloc(params.bufferSize);
+    void* memory = malloc(params.memSize);
     while (1)
     {
         printf("%s", params.message);
-        scanf(params.inputType, buffer);
+        scanf(params.inputType, memory);
 
         //ruft die validations funktion auf mit dem eingelesenen wert und den validation daten
-        if (validate(buffer, params.validationData))
+        if (validate(memory, params.validationData))
         {
-            return buffer;
+            return memory;
         }
 
         printf("%s", params.errorMessage);
@@ -161,7 +168,9 @@ appointment createAppointment()
 {
     appointment newAppointment;
 
-    void* buffer = getUserInputWithValidation(
+    //Frag den User nach neuen Input
+    void* mem = getUserInputWithValidation(
+            //Erstellt user input parameter
             (userInputParams) {
                     " %c",
                     "\nGib einen Typen ein: Freunde (f), Geschaeftlich (b), Pause (p): ",
@@ -171,9 +180,10 @@ appointment createAppointment()
             },
             validateGenericTypeAsChar
     );
-    newAppointment.type = (appointmentType) *((char*) buffer);
+    //Castet den void Pointer zu nem char und den char dann als appointmentType
+    newAppointment.type = (appointmentType) *((char*) mem);
 
-    buffer = getUserInputWithValidation(
+    mem = getUserInputWithValidation(
             (userInputParams) {
                     " %d",
                     "\nGib eine Uhrzeit ein (8-21): ",
@@ -183,24 +193,29 @@ appointment createAppointment()
             },
             validateIntegerBoundsIncl
     );
-    newAppointment.time = *((int*) buffer);
+    //Caste den void pointer zu nem int
+    newAppointment.time = *((int*) mem);
 
-    char temp[30];
-    sprintf(temp, "\nGib eine Dauer ein (1-%d): ", 22 - newAppointment.time);
+    //Bereitet die Message fürs Abfragen der länge vor
+    char preparedMessage[30];
+    //sprintf formatiert einen string.
+    sprintf(preparedMessage, "\nGib eine Dauer ein (1-%d): ", 22 - newAppointment.time);
 
-    buffer = getUserInputWithValidation(
+    mem = getUserInputWithValidation(
             (userInputParams) {
                     " %d",
-                    temp,
+                    preparedMessage,
                     "\nUngueltige Eingabe!",
                     sizeof(int),
                     (int[]) {1, 22 - newAppointment.time}
             },
             validateIntegerBoundsIncl
     );
-    newAppointment.duration = *((int*) buffer);
+    //caste den void* zu nem int
+    newAppointment.duration = *((int*) mem);
 
-    free(buffer);
+    //Lösche den void* aus dem heap
+    free(mem);
     return newAppointment;
 }
 
@@ -214,6 +229,8 @@ void addAppointment(struct appointment* schedule, int* length)
 
     appointment newAppointment = createAppointment();
 
+    //Checkt, ob der Termin links von i kleiner als der neue Termin ist.
+    //Wenn ja, wird der neue Termin an der Stelle i eingesetzt
     for (int i = *length; i >= 0; --i)
     {
         if (!i || schedule[i - 1].time < newAppointment.time)
@@ -238,7 +255,8 @@ void deleteAppointment(struct appointment* schedule, int* length)
     printAppointments(schedule, *length);
     printf("\nWelchen dieser Termine moechten Sie loeschen? (1-%d): ", *length);
 
-    void* buffer = getUserInputWithValidation(
+    //Frag den user nach dem Index
+    void* mem = getUserInputWithValidation(
             (userInputParams) {
                     " %d",
                     "",
@@ -248,17 +266,19 @@ void deleteAppointment(struct appointment* schedule, int* length)
             },
             validateIntegerBoundsIncl
     );
-    int index = *((int*) buffer);
-    free(buffer);
+    //Caste den void* zu nem int
+    int index = *((int*) mem);
+    free(mem);
 
     printf("\nTermin %d wurde geloescht!", index);
+    //Schieb alle element ab dem index nach links
     for (int i = index - 1; i < *length - 1; ++i)
     {
         schedule[i] = schedule[i + 1];
     }
     (*length)--;
 }
-
+//TODO
 enum menuAction
 {
     NEW_APPOINTMENT = 'n',
@@ -267,14 +287,15 @@ enum menuAction
     INFO_SCHEDULE = 'i',
     EXIT_PROGRAM = 'x'
 } typedef menuAction;
-
+//TODO
 void programMenu(appointment* schedule, int* scheduleCount)
 {
-    void* userInputBuffer = NULL;
+    void* mem = NULL;
 
     while (1)
     {
-        userInputBuffer = getUserInputWithValidation(
+        //Frag den User nach Input
+        mem = getUserInputWithValidation(
                 (userInputParams) {
                         " %c",
                         "\nNeuen Termin (n), Termin loeschen (d), Termine auflisten (l), Informationen ausgeben (i), Programm beenden (x)\nAuswahl: ",
@@ -285,7 +306,8 @@ void programMenu(appointment* schedule, int* scheduleCount)
                 validateGenericTypeAsChar
         );
 
-        switch ((menuAction) *((char*) userInputBuffer))
+        //Castet den void pointer zu nem menuAction und ruft dann die richtige Funktion auf
+        switch ((menuAction) *((char*) mem))
         {
             case NEW_APPOINTMENT:
                 addAppointment(schedule, scheduleCount);
@@ -300,7 +322,8 @@ void programMenu(appointment* schedule, int* scheduleCount)
                 printInformation(schedule, *scheduleCount);
                 break;
             case EXIT_PROGRAM:
-                free(userInputBuffer);
+                //Lösch den void pointer aus dem heap
+                free(mem);
                 return;
         }
     }
