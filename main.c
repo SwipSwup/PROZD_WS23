@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-int compare(const void* a, const void* b)
+int compareAsc(const void* a, const void* b)
 {
     int int_a = *((int*) a);
     int int_b = *((int*) b);
@@ -20,19 +20,17 @@ int compare(const void* a, const void* b)
     return 1;
 }
 
+int compareDsc(const void* a, const void* b) {
+    return -compareAsc(a, b);
+}
+
 int main()
 {
-
     int size1, size2;
-
     printf(": ");
     scanf(" %d %d", &size1, &size2);
 
-    int arr1[size1];
-    int arr2[size2];
-
-    printf("size1: %d\n", size1);
-    printf("size2: %d\n", size2);
+    int arr1[size1], arr2[size2];
 
     for (int i = 0, val = 0; i < size1; ++i)
     {
@@ -46,42 +44,32 @@ int main()
         arr2[i] = val;
     }
 
-    qsort(arr1, size1, sizeof(int), compare);
-    qsort(arr2, size2, sizeof(int), compare);
+    qsort(arr1, size1, sizeof(int), compareDsc);
+    qsort(arr2, size2, sizeof(int), compareAsc);
 
     //pair1, pair2, difference
     int pair[3] = {0, 0, INT_MAX};
-
-    for (int i = size1 - 1; i >= 0; --i)
+    for (int i = 0; i < size1; ++i)
     {
-        printf("i: %d\n", arr1[i]);
-        printf("j: %d\n", arr2[0]);
-        if (arr1[i] < arr2[0])
-        {
-            break;
-        }
+        int min = INT_MAX;
 
         for (int j = 0; j < size2; ++j)
         {
-
-            if (arr1[i] < arr2[j])
+            if (abs(arr1[i] - arr2[j]) > min)
             {
                 break;
             }
 
-            printf("i: %d\n", arr1[i]);
-            printf("j: %d\n", arr2[j]);
-
-            if (pair[2] > arr1[i] - arr2[j])
+            min = abs(arr1[i] - arr2[j]);
+            if (pair[2] > min)
             {
                 pair[0] = arr1[i];
                 pair[1] = arr2[j];
-                pair[2] = arr1[i] - arr2[j];
+                pair[2] = min;
             }
         }
     }
 
     printf("%d (%d, %d)", pair[2], pair[0], pair[1]);
-
     return 0;
 }
