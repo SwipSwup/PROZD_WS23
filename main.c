@@ -31,45 +31,58 @@ char** initializeBoard()
     return board;
 }
 
+int isOnBoard(vector2D position) {
+    if (position.x < 0 || position.x > BOARD_SIZE - 1 || position.y < 0 || position.y > BOARD_SIZE - 1) {
+        return 0;
+    }
+
+    return 1;
+}
+
 int updateBoard(transform* ant, char** board)
 {
-    board[ant->position.x][ant->position.y] = board[ant->position.x][ant->position.y] ? '#' : '.', '#';
-
     switch (board[ant->position.x][ant->position.y])
     {
-        case '#':
-            board[ant->position.x][ant->position.y] = '.';
-            ant->rotation = (vector2D) {-ant->rotation.y, ant->rotation.x};
-            break;
         case '.':
             board[ant->position.x][ant->position.y] = '#';
+            //Turns right (is inverted??)
+            ant->rotation = (vector2D) {-ant->rotation.y, ant->rotation.x};
+            break;
+        case '#':
+            board[ant->position.x][ant->position.y] = '.';
+            //Turns right (is inverted??)
             ant->rotation = (vector2D) {ant->rotation.y, -ant->rotation.x};
             break;
     }
 
-    vector2D newPosition = (vector2D) {ant->position.x + ant->rotation.x, ant->position.y + ant->rotation.y};
-    if (newPosition.x < 0 || newPosition.x > BOARD_SIZE - 1 || newPosition.y < 0 || newPosition.y > BOARD_SIZE - 1) {
-        return 0;
-    }
+    ant->position = (vector2D) {ant->position.x + ant->rotation.x, ant->position.y + ant->rotation.y};
 
-    ant->position = newPosition;
-    return 1;
+    return isOnBoard(ant->position);
 }
 
 void printBoard(vector2D position, char** board) {
-    for (int x = 0; x < BOARD_SIZE; ++x)
+    for (int y = 0; y < BOARD_SIZE; ++y)
     {
-        printf("\n");
-        for (int y = 0; y < BOARD_SIZE; ++y)
+        for (int x = 0; x < BOARD_SIZE; ++x)
         {
-            if(position.x == x && position.y == y) {
-                printf("%c", 'a');
+            if(isOnBoard(position) && position.x == x && position.y == y) {
+                printf("%c", board[x][y] == '.' ? 'a' : 'A');
                 continue;
             }
 
             printf("%c", board[x][y]);
         }
+        printf("\n");
     }
+}
+
+void freeBoard(char** board)
+{
+    for (int x = 0; x < BOARD_SIZE; ++x)
+    {
+        free(board[x]);
+    }
+    free(board);
 }
 
 int main()
@@ -84,7 +97,6 @@ int main()
     printf("Start position: ");
     scanf(" %d %d", &ant.position.x, &ant.position.y);
 
-
     for (int i = 0; i < numberOfTurns; ++i)
     {
         if(!updateBoard(&ant, board)) {
@@ -93,6 +105,7 @@ int main()
     }
 
     printBoard(ant.position, board);
+    freeBoard(board);
 
     return 0;
 }
