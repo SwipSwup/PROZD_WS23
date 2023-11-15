@@ -77,7 +77,7 @@ void printInformation(struct appointment* schedule, int length)
     //looped durch das schedule und schaut, ob zwischen zwei hintereinanderliegende termine ungenutzte Zeit liegt.
     for (int i = 0; i < length - 1; ++i)
     {
-        //TODO
+        //Checkt, ob die endzeit des termins direkt an dem start des nächsten termins anliegt
         if (schedule[i].time + schedule[i].duration < schedule[i + 1].time)
         {
             printf("\nZwischen den Terminen %d und %d liegen %dh ungeplante Zeit.",
@@ -278,7 +278,8 @@ void deleteAppointment(struct appointment* schedule, int* length)
     }
     (*length)--;
 }
-//TODO
+
+//Die verschiedenen programm aktionen mit deren zugehörigen chars
 enum menuAction
 {
     NEW_APPOINTMENT = 'n',
@@ -287,7 +288,8 @@ enum menuAction
     INFO_SCHEDULE = 'i',
     EXIT_PROGRAM = 'x'
 } typedef menuAction;
-//TODO
+
+//Liest user input und führt die richtige funktion aus
 void programMenu(appointment* schedule, int* scheduleCount)
 {
     void* mem = NULL;
