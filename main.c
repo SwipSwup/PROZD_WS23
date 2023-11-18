@@ -6,6 +6,8 @@ void selection_sort(int a[], int N)
     int i, j, min, t;
     for (i = 0; i < N - 1; i++)
     {
+        printf("Step %d: ");
+
         min = i;
         for (j = i + 1; j < N; j++) // suche kleinstes El.
         {
@@ -14,6 +16,10 @@ void selection_sort(int a[], int N)
         t = a[min]; // Tausch
         a[min] = a[i];
         a[i] = t;
+        for (int k = 0; k < ; ++k)
+        {
+            
+        }
     }
 }
 
@@ -22,21 +28,24 @@ int main()
 {
     int numbers[1024];
 
-    int i = 0, in;
+    int size = 0, in;
     while (1)
     {
-        scanf(" %d ", &in);
+        scanf(" %d", &in);
         if (!in)
         {
             break;
         }
 
-        numbers[i++] = in;
+        numbers[size++] = in;
     }
 
-    selection_sort(numbers, i);
+    selection_sort(numbers, size);
 
-    printf("%d ");
+    for (int i = 0; i < size; ++i)
+    {
+        printf("%d ", numbers[i]);
+    }
 
     return 0;
 }
