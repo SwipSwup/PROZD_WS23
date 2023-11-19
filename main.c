@@ -6,7 +6,6 @@ struct node
     int height;
     int index;
     struct node* next;
-    struct node* previous;
 } typedef node;
 
 node* createNode(int height)
@@ -15,7 +14,6 @@ node* createNode(int height)
     newNode->height = height;
     newNode->index = 0;
     newNode->next = NULL;
-    newNode->previous = NULL;
     return newNode;
 }
 
