@@ -19,21 +19,54 @@ node* createNode(int height)
     return newNode;
 }
 
-void addNode(node* newNode, node* list)
+node* addNode(node* newNode, node* list)
 {
-    if (list->next == NULL)
+    newNode->next = list;
+    if (list != NULL)
     {
-        list->next = newNode;
         newNode->index = list->index + 1;
+    }
+    return newNode;
+}
+
+void updateList(int newHeight, node* list)
+{
+    if (list == NULL || list->next == NULL)
+    {
         return;
     }
 
-    if(list->next->height <= newNode->height) {
+    if (list->next->height <= newHeight)
+    {
+        node* tmp = list->next;
         list->next = list->next->next;
+        free(tmp);
+        updateList(newHeight, list);
     }
-    addNode(newNode, list->next);
 }
 
+void printList(node* list)
+{
+    if (list == NULL)
+    {
+        return;
+    }
+
+    printList(list->next);
+    printf("%d [%d] ", list->height, list->index);
+
+}
+
+void freeAll(node* list)
+{
+    if (list == NULL)
+    {
+        return;
+    }
+
+    freeAll(list->next);
+    free(list);
+}
 
 int main()
 {
@@ -43,26 +76,19 @@ int main()
 
     while (1)
     {
+        printf(": ");
         scanf(" %d", &nextHeight);
         if (!nextHeight)
         {
             break;
         }
-        node* newNode = createNode(nextHeight);
-        if (list == NULL)
-        {
-            list = newNode;
-        }
-        else
-        {
-            addNode(newNode, list);
-            for (node* n = list; n != NULL; n = n->next)
-            {
-                printf("%d [%d] ", n->height, n->index);
-            }
-            printf("\n");
-        }
-    }
 
+        list = addNode(createNode(nextHeight), list);
+        updateList(list->height, list);
+        printList(list);
+        printf("\n");
+    }
+    printList(list);
+    freeAll(list);
     return 0;
 }
