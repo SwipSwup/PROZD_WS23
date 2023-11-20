@@ -5,25 +5,24 @@
 
 char* scanText()
 {
-    char nextChar;
     char* text = (char*) malloc(sizeof (char) * 1001);
-    int i = 0;
+    text[1000] = '\n';
 
-    while (1)
+    for (int i = 0; i < 1000;)
     {
-        scanf("%c", &nextChar);
+        scanf("%c", &text[i]);
 
-        if (nextChar == '\n' || i > 1000)
+        if (text[i] == '\n')
         {
+            text[i] = '\0';
             break;
         }
 
-        if(isalpha(nextChar) || isspace(nextChar)) {
-            text[i++] = nextChar;
+        if(isalpha(text[i]) || isspace(text[i])) {
+            i++;
         }
     }
 
-    text[i] = '\0';
     return text;
 }
 
@@ -105,7 +104,7 @@ int main()
 
     printf("words: ");
     char** words = scanWords();
-    for (int i = 0; strcmp(words[i], "") != 0; ++i)
+    for (int i = 0; strlen(words[i]); ++i)
     {
         printf("\n%s: %d", words[i], countWord(text, words[i]));
     }
