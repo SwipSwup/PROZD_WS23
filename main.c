@@ -15,25 +15,78 @@ node* createNode(char costumerId)
     return newNode;
 }
 
-node* addNode(char customerId, node* list)
+node* addNode(node* newNode, node* list)
 {
-    node* newNode = createNode(customerId);
-
     if (list == NULL)
     {
         return newNode;
     }
 
-    newNode->next = list;
-    return newNode;
+    node* n = list;
+    for (; n->next != NULL; n = n->next);
+    n->next = newNode;
+    return list;
 }
 
-void removeNode(char customerId, node* list)
+int getListLength(node* list)
+{
+    int i = 0;
+    for (node* n = list; n != NULL; n = n->next, i++);
+    return i;
+}
+
+node* removeFirstNode(node* list)
+{
+    if (list == NULL)
+    {
+        return NULL;
+    }
+
+    node* next = list->next;
+    free(list);
+    return next;
+}
+
+void printList(node* list, char* msg)
+{
+    printf("%s %d\n", msg, getListLength(list));
+
+    for (node* n = list; n != NULL; n = n->next)
+    {
+        printf("%c ", n->customerId);
+    }
+    printf("\n");
+}
+
+void printBilla(node* customerList, node* registerOne, node* registerTwo)
+{
+    printList(customerList, "Personen:");
+    printList(registerOne, "Kassa 1:");
+    printList(registerTwo, "Kassa 2:");
+}
+
+void populateRegister(node* customer, node** registerOne, node** registerTwo)
+{
+    customer->next = NULL;
+    if (getListLength(*registerOne) <= getListLength(*registerTwo))
+    {
+        *registerOne = addNode(customer, *registerOne);
+    }
+    else
+    {
+        *registerTwo = addNode(customer, *registerTwo);
+    }
+}
+
+void freeAll(node* list)
 {
     if (list == NULL)
     {
         return;
     }
+
+    freeAll(list->next);
+    free(list);
 }
 
 int main()
@@ -50,14 +103,13 @@ int main()
 
         if (nextCustomerId == '-') break;
 
-        customerList = addNode(nextCustomerId, customerList);
+        customerList = addNode(createNode(nextCustomerId), customerList);
     }
 
     int run = 1;
     while (run)
     {
-        // Print here
-
+        printBilla(customerList, registerOne, registerTwo);
 
         char c;
         printf(": ");
@@ -68,21 +120,32 @@ int main()
         switch (c)
         {
             case '-':
+            {
                 run = 0;
                 break;
+            }
             case 'a':
-                // anstellen
+            {
+                node* next = customerList->next;
+                populateRegister(customerList, &registerOne, &registerTwo);
+                customerList = next;
                 break;
+            }
             case '1':
-                // kassa1
+            {
+                registerOne = removeFirstNode(registerOne);
                 break;
+            }
             case '2':
-                // kassa2
+            {
+                registerTwo = removeFirstNode(registerTwo);
                 break;
+            }
         }
     }
 
-    // free customerList
-
+    freeAll(customerList);
+    freeAll(registerOne);
+    freeAll(registerTwo);
     return 0;
 }
