@@ -5,6 +5,10 @@
 #define MAX_TITLE_LENGTH 31
 #define VALID_MENU_ACTIONS "nbrlsx"
 
+//####################################################//
+//# ICH HABE DEN TEST NICHT GANZ NACH ANGABE GEMACHT #//
+//####################################################//
+
 enum genre_type
 {
     HORROR,
@@ -29,10 +33,20 @@ struct bookNode
 
 struct borrowerNode
 {
-    book* book;
     char* name;
-    struct borrowNode* next;
+    struct borrowerNode* next;
 } typedef borrowerNode;
+
+struct borrowedBook {
+    book* book;
+    borrowerNode* borrowers;
+} typedef borrowedBook;
+
+struct borrowedBookNode
+{
+    borrowedBook* borrowedBook;
+    struct borrowedBookNode* next;
+} typedef borrowedBookNode;
 
 struct userInputParams
 {
@@ -94,7 +108,7 @@ book* createBook()
     newBook->title = (char*) getUserInputWithValidation(
             (userInputParams) {
                     "%s",
-                    "\nGeben Sie den Titel ein:",
+                    "\nGeben Sie den Titel ein: ",
                     MAX_TITLE_LENGTH + 1,
                     (int[]) {MAX_TITLE_LENGTH}
             },
@@ -111,6 +125,7 @@ book* createBook()
             validateIntegerBoundsIncl
     );
     newBook->genre = *((int*) mem);
+    free(mem);
 
     mem = getUserInputWithValidation(
             (userInputParams) {
@@ -122,6 +137,7 @@ book* createBook()
             validateIntegerIsAboveLowerBoundExcl
     );
     newBook->year = *((int*) mem);
+    free(mem);
 
     mem = getUserInputWithValidation(
             (userInputParams) {
@@ -133,8 +149,8 @@ book* createBook()
             validateIntegerIsAboveLowerBoundExcl
     );
     newBook->amount = *((int*) mem);
-
     free(mem);
+
     return newBook;
 }
 
@@ -156,16 +172,179 @@ bookNode* addBookToInventory(book* book, bookNode* inventory)
         return newBookNode;
     }
 
-    for (bookNode* n = inventory; n != NULL; n = n->next)
+    for (bookNode* b = inventory; b != NULL; b = b->next)
     {
-        if (n->next == NULL)
+        if (b->next == NULL)
         {
-            n->next = newBookNode;
-            n = n->next;
+            b->next = newBookNode;
+            b = b->next;
         }
     }
 
     return inventory;
+}
+
+bookNode* getBookNodeWithIndex(int index, bookNode* inventory)
+{
+    for (bookNode* bookIterator = inventory; bookIterator != NULL; bookIterator = bookIterator->next)
+    {
+        if (!(--index))
+        {
+            return bookIterator;
+        }
+    }
+
+    return NULL;
+}
+
+void insertBook(bookNode** inventory)
+{
+    *inventory = addBookToInventory(createBook(), *inventory);
+}
+
+int getBorrowedBooksSize(borrowedBookNode* borrowedBooks)
+{
+    int size = 0;
+
+    for (borrowedBookNode* borrowedBookIterator = borrowedBooks;
+         borrowedBookIterator != NULL; borrowedBookIterator = borrowedBookIterator->next, size++);
+
+    return size;
+}
+
+
+
+int isBorrower(char* name, borrowerNode* borrowedBook)
+{
+    for (borrowerNode* borrowerIterator = borrowedBook;
+         borrowerIterator != NULL; borrowerIterator = borrowedBook->next)
+    {
+        if (!strcmp(name, borrowerIterator->name))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int isBookBorrowed(book* book, borrowedBookNode* borrowedBooks)
+{
+    for (borrowedBookNode* borrowedBookIterator = borrowedBooks;
+         borrowedBookIterator != NULL; borrowedBookIterator = borrowedBookIterator->next)
+    {
+        if (!strcmp(borrowedBookIterator->book->title, book->title))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int tryGetBorrowedBookByName(char* name, borrowedBookNode* borrowedBooks, borrowedBook* outBorrowedBook) {
+    for (borrowedBookNode* borrowedBookIterator = borrowedBooks;
+         borrowedBookIterator != NULL; borrowedBookIterator = borrowedBookIterator->next)
+    {
+        if (!strcmp(borrowedBookIterator->book->title, book->title))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int isBookBorrowedByName(book* book, char* name, borrowedBookNode* borrowedBooks)
+{
+    for (borrowedBookNode* borrowedBookIterator = borrowedBooks;
+         borrowedBookIterator != NULL; borrowedBookIterator = borrowedBookIterator->next)
+    {
+        if (!strcmp(borrowedBookIterator->book->title, book->title) &&
+            isBorrower(name, borrowedBookIterator->borrowers))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+borrowedBookNode* createBorrowedBookNode(book* book, borrowerNode* borrowers)
+{
+    borrowedBookNode* newBorrowedBookNode = (borrowedBookNode*) malloc(sizeof(borrowedBookNode));
+    newBorrowedBookNode->book = book;
+    newBorrowedBookNode->borrowers = borrowers;
+    newBorrowedBookNode->next = NULL;
+    return newBorrowedBookNode;
+}
+
+borrowedBookNode* addBookToBorrowedBookNode(book* book, char* name, borrowedBookNode* borrowedBooks)
+{
+    if (isBookBorrowed(book, borrowedBooks))
+    {
+
+    }
+}
+
+void borrowBook(bookNode* inventory, borrowedBookNode** borrowedBooks)
+{
+    if (inventory == NULL)
+    {
+        printf("\nEs sind keine Buecher im Inventar vorhanden.");
+        return;
+    }
+
+    char* preparedString = NULL;
+    sprintf(preparedString, "Welchen Titel moechten Sie leihen? (1-%d): ", getBorrowedBooksSize(*borrowedBooks));
+
+    void* mem = getUserInputWithValidation(
+            (userInputParams)
+                    {
+                            "%d",
+                            preparedString,
+                            sizeof(int),
+                            (int[]) {1, getBorrowedBooksSize(*borrowedBooks)}
+                    },
+            validateIntegerBoundsIncl
+    );
+
+    bookNode* bookNode = getBookNodeWithIndex(*((int*) mem), inventory);
+    free(mem);
+
+    char* name = (char*) getUserInputWithValidation(
+            (userInputParams) {
+                    "%s",
+                    "\nGeben Sie Ihren Namen ein: ",
+                    MAX_TITLE_LENGTH + 1,
+                    (int[]) {MAX_TITLE_LENGTH}
+            },
+            validateStringLength
+    );
+
+    if (isBookBorrowedByName(bookNode->book, name, *borrowedBooks))
+    {
+        printf("\nSie haben diesen Titel bereits ausgeliehen!");
+        return;
+    }
+
+    if (!bookNode->book->amount)
+    {
+        printf("\nBereits alle Exemplare ausgeliehen!");
+        return;
+    }
+
+    *borrowedBooks = addBookToBorrowedBookNode(bookNode->book, name, *borrowedBooks);
+}
+
+void printInventory(bookNode* inventory)
+{
+    int i = 1;
+    for (bookNode* bookIterator = inventory; bookIterator == NULL; ++i, bookIterator = bookIterator->next)
+    {
+        printf("%d: %s, %s (%d)",
+               i,
+               bookIterator->book->title,
+               (char* []) {"Horror", "Abenteuer", "Romantik", "Sachbuch"}[bookIterator->book->genre],
+                bookIterator->book->year
+        );
+    }
 }
 
 void freeBook(book* book)
@@ -174,8 +353,10 @@ void freeBook(book* book)
     free(book);
 }
 
-void freeInventory(bookNode* inventory) {
-    if(inventory == NULL) {
+void freeInventory(bookNode* inventory)
+{
+    if (inventory == NULL)
+    {
         return;
     }
 
@@ -189,18 +370,17 @@ enum menuAction
     INSERT_BOOK = 'n',
     BORROW_BOOK = 'b',
     RETURN_BOOK = 'r',
-    PRINT_LIST  = 'l',
+    PRINT_LIST = 'l',
     PRINT_LIST_IN_ORDER = 's',
     EXIT_PROGRAM = 'x'
 } typedef menuAction;
 
-void programMenu(bookNode* inventory)
+void programMenu(bookNode* inventory, borrowedBookNode* borrowedBooks)
 {
     void* mem = NULL;
 
     while (1)
     {
-        //Frag den User nach Input
         mem = getUserInputWithValidation(
                 (userInputParams) {
                         " %c",
@@ -214,13 +394,15 @@ void programMenu(bookNode* inventory)
         switch ((menuAction) *((char*) mem))
         {
             case INSERT_BOOK:
-                inventory = addBookToInventory(createBook(), inventory);
+                insertBook(&inventory);
                 break;
             case BORROW_BOOK:
+
                 break;
             case RETURN_BOOK:
                 break;
             case PRINT_LIST:
+                printInventory(inventory);
                 break;
             case PRINT_LIST_IN_ORDER:
                 break;
@@ -229,13 +411,15 @@ void programMenu(bookNode* inventory)
                 free(mem);
                 return;
         }
+        free(mem);
     }
 }
 
 int main()
 {
     bookNode* inventory = NULL;
-    programMenu(inventory);
+    borrowedBookNode* borrowedBooks = NULL;
+    programMenu(inventory, borrowedBooks);
 
     return 0;
 }
