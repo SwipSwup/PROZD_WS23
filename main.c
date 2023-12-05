@@ -34,7 +34,7 @@ struct book
 struct borrowedBook
 {
     book* book;
-    node* borrowers;
+    char* borrower;
 } typedef borrowedBook;
 
 struct userInputParams
@@ -90,28 +90,32 @@ void* getUserInputWithValidation(const userInputParams params, int validate(cons
     }
 }
 
-//TODO
-void printList(node* list, void printItem(const void*, const int))
+void printList(node* list, void printItem(const void*))
 {
     int i = 1;
     for (node* iterator = list; iterator != NULL; ++i, iterator = iterator->next)
     {
-        printItem(list->item, i);
-
-
+        printf("\n%d: ", i);
+        printItem(iterator->item);
     }
 
     printf("\n");
 }
 
-void printBook(const void* item, const int index)
+void printBook(const void* item)
 {
-    printf("\n%d: %s, %s (%d)",
-           index,
+    printf("%s, %s (%d)",
            ((book*) item)->title,
            (char* []) {"Horror", "Abenteuer", "Romantik", "Sachbuch"}[((book*) item)->genre - 1],
             ((book*) item)->year
     );
+}
+
+void printBorrowedBook(const void* item)
+{
+    borrowedBook* borrowedBook = ((struct borrowedBook*) item);
+
+    printf("%s geliehen von %s", borrowedBook->book->title, borrowedBook->borrower);
 }
 
 int getListSize(node* list)
@@ -143,6 +147,35 @@ node* createNode(void* item)
     return newNode;
 }
 
+void freeNode(node* node, void freeItem(void*))
+{
+    freeItem(node->item);
+    free(node);
+}
+
+void freeBook(void* book)
+{
+    free(((struct book*) book)->title);
+    free(book);
+}
+
+void freeBorrowedBook(void* borrowedBook)
+{
+    free(((struct borrowedBook*) borrowedBook)->borrower);
+    free(borrowedBook);
+}
+
+void freeList(node* list, void freeItem(void*))
+{
+    if (list == NULL)
+    {
+        return;
+    }
+
+    freeList(list->next, freeItem);
+    freeNode(list, freeItem);
+}
+
 node* addItemToList(void* item, node* list)
 {
     node* newNode = createNode(item);
@@ -168,6 +201,25 @@ node* getNodeWithIndex(int index, node* list)
     return NULL;
 }
 
+node* removeItemFromListAtIndex(int index, node* list, void freeItem(void*))
+{
+    if (index == 0)
+    {
+        node* next = list->next;
+        freeNode(list, freeItem);
+
+        return next;
+    }
+
+    node* previous = getNodeWithIndex(index - 1, list);
+    node* node = previous->next;
+
+    previous->next = node->next;
+    freeNode(node, freeItem);
+
+    return list;
+}
+
 book* createBook()
 {
     book* newBook = (book*) malloc(sizeof(book));
@@ -182,7 +234,7 @@ book* createBook()
             validateStringLength
     );
 
-    void* mem = getUserInputWithValidation(
+    int* genre = getUserInputWithValidation(
             (userInputParams) {
                     "%d",
                     "\nGeben Sie das Genre ein. Horror (1), Abenteuer (2), Romantik (3), Sachbuch (4): ",
@@ -191,10 +243,10 @@ book* createBook()
             },
             validateIntegerBoundsIncl
     );
-    newBook->genre = *((int*) mem);
-    free(mem);
+    newBook->genre = *genre;
+    free(genre);
 
-    mem = getUserInputWithValidation(
+    int* year = getUserInputWithValidation(
             (userInputParams) {
                     "%d",
                     "\nGeben Sie das Erscheinungsjahr ein: ",
@@ -203,10 +255,10 @@ book* createBook()
             },
             validateIntegerIsAboveLowerBoundExcl
     );
-    newBook->year = *((int*) mem);
-    free(mem);
+    newBook->year = *year;
+    free(year);
 
-    mem = getUserInputWithValidation(
+    int* amount = getUserInputWithValidation(
             (userInputParams) {
                     "%d",
                     "\nGeben Sie ein wieviele Exemplare vorhanden sind: ",
@@ -215,8 +267,8 @@ book* createBook()
             },
             validateIntegerIsAboveLowerBoundExcl
     );
-    newBook->amount = *((int*) mem);
-    free(mem);
+    newBook->amount = *amount;
+    free(amount);
 
     return newBook;
 }
@@ -226,20 +278,20 @@ void insertBook(node** inventory)
     *inventory = addItemToList(createBook(), *inventory);
 }
 
-
 borrowedBook* createBorrowedBook(book* book, char* name)
 {
     borrowedBook* newBorrowedBook = (borrowedBook*) malloc(sizeof(borrowedBook));
     newBorrowedBook->book = book;
-    newBorrowedBook->borrowers = createNode(name);
+    newBorrowedBook->borrower = name;
     return newBorrowedBook;
 }
 
-int isBorrower(char* name, node* borrowers)
+//TODO clean up
+int isBorrower(char* name, book* book, node* borrowedBooks)
 {
-    for (node* iterator = borrowers; iterator != NULL; iterator = iterator->next)
+    for (node* iterator = borrowedBooks; iterator != NULL; iterator = iterator->next)
     {
-        if (!strcmp(name, iterator->item))
+        if (((borrowedBook*) iterator->item)->book == book && !strcmp(((borrowedBook*) iterator->item)->borrower, name))
         {
             return 1;
         }
@@ -247,7 +299,19 @@ int isBorrower(char* name, node* borrowers)
     return 0;
 }
 
-int tryGetBorrowedBookByBook(book* book, node* borrowedBooks, borrowedBook** outBorrowedBook)
+
+//borrowedBook* getBorrowedBookByBook(book* book, node* borrowedBooks) {
+//    for (node* iterator = borrowedBooks; iterator != NULL; iterator = iterator->next)
+//    {
+//        if (((borrowedBook*) iterator->item)->book == book)
+//        {
+//            return ((borrowedBook*) iterator->item);
+//        }
+//    }
+//    return NULL;
+//}
+
+/*int tryGetBorrowedBookByBook(book* book, node* borrowedBooks, borrowedBook** outBorrowedBook)
 {
     for (node* iterator = borrowedBooks; iterator != NULL; iterator = iterator->next)
     {
@@ -258,7 +322,7 @@ int tryGetBorrowedBookByBook(book* book, node* borrowedBooks, borrowedBook** out
         }
     }
     return 0;
-}
+}*/
 
 void borrowBook(node* inventory, node** borrowedBooks)
 {
@@ -268,7 +332,7 @@ void borrowBook(node* inventory, node** borrowedBooks)
         return;
     }
 
-    printList(inventory);
+    printList(inventory, printBook);
 
     char preparedString[100];
     sprintf(preparedString, "\nWelchen Titel moechten Sie leihen? (1-%d): ", getListSize(inventory));
@@ -297,8 +361,7 @@ void borrowBook(node* inventory, node** borrowedBooks)
             validateStringLength
     );
 
-    borrowedBook* borrowedBook = NULL;
-    if (tryGetBorrowedBookByBook(book, *borrowedBooks, &borrowedBook) && isBorrower(name, borrowedBook->borrowers))
+    if (isBorrower(name, book, *borrowedBooks))
     {
         printf("\nSie haben diesen Titel bereits ausgeliehen!");
         return;
@@ -310,47 +373,35 @@ void borrowBook(node* inventory, node** borrowedBooks)
         return;
     }
 
-    if (borrowedBook == NULL)
-    {
-        borrowedBook = createBorrowedBook(book, name);
-    }
-    else
-    {
-        borrowedBook->borrowers = addItemToList(name, borrowedBook->borrowers);
-    }
-
-    *borrowedBooks = addItemToList(borrowedBook, *borrowedBooks);
+    *borrowedBooks = addItemToList(createBorrowedBook(book, name), *borrowedBooks);
     book->amount--;
-
 }
 
 void returnBook(node* inventory, node** borrowedBooks)
 {
-
-}
-
-void freeList(node* list, void freeItem(void*))
-{
-    if (list == NULL)
+    if (*borrowedBooks == NULL)
     {
-        return;
+        printf("\nEs sind keine Titel ausgeliehen!");
     }
-    freeList(list->next, freeItem);
 
-    freeItem(list->item);
-    free(list);
-}
+    printList(*borrowedBooks, printBorrowedBook);
 
-void freeBook(void* book)
-{
-    free(((struct book*) book)->title);
-    free(book);
-}
+    char preparedString[100];
+    sprintf(preparedString, "Welchen Titel moechten Sie retournieren? (1-%d): ", getListSize(*borrowedBooks));
+    int* index = (int*) getUserInputWithValidation(
+            (userInputParams) {
+                    "%d",
+                    preparedString,
+                    sizeof(int),
+                    (int[]) {1, getListSize(*borrowedBooks)}
+            },
+            validateIntegerBoundsIncl
+    );
 
-void freeBorrowedBook(void* borrowedBook)
-{
-    freeList(((struct borrowedBook*) borrowedBook)->borrowers, free);
-    free(borrowedBook);
+    ((book*)getNodeWithIndex(*index, *borrowedBooks)->item)->amount++;
+    *borrowedBooks = removeItemFromListAtIndex(*index, *borrowedBooks, freeBorrowedBook);
+
+    free(index);
 }
 
 enum menuAction
@@ -388,6 +439,7 @@ void programMenu(node* inventory, node* borrowedBooks)
                 borrowBook(inventory, &borrowedBooks);
                 break;
             case RETURN_BOOK:
+                returnBook(inventory, &borrowedBooks);
                 break;
             case PRINT_LIST:
                 //printf("\nsize: %d", getListSize(inventory));
