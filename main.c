@@ -9,9 +9,10 @@
 //# ICH HABE DEN TEST NICHT GANZ NACH ANGABE GEMACHT #//
 //####################################################//
 
-/// All available genres. The way I handelt them makes this enum obsolete.
+/// An enum holding all available genres.
 enum genre_type
 {
+    // The way I handelt genres makes this enum obsolete.
     HORROR,
     ADVENTURE,
     ROMANCE,
@@ -53,35 +54,39 @@ struct userInputParams
 } typedef userInputParams;
 
 /// This function validates if the given type is in the valid types.
-/// \param [char] type The type to be checked.
-/// \param types The valid types.
+/// \param type The type to be checked of type char*.
+/// \param types The valid types of type char*.
 /// \return True if the type is in types otherwise false.
 int validateGenericTypeAsChar(const void* type, const void* types)
 {
     return strchr((char*) types, *((char*) type)) != NULL;
 }
 
-/// This function validates if the give number is bigger than the lower boundary
-/// \param number The number to be checked
-/// \param lowerBound The lower boundary
-/// \return True if the number is bigger than the boundary otherwise false
+/// This function validates if the give number is bigger than the lower boundary.
+/// \param number The number to be checked of type int*.
+/// \param lowerBound The lower boundary of type int*.
+/// \return True if the number is bigger than the boundary otherwise false.
 int validateIntegerIsAboveLowerBoundExcl(const void* number, const void* lowerBound)
 {
     return *((int*) number) > *((int*) lowerBound);
 }
 
-///
-/// \param number
-/// \param bounds
-/// \return
+/// This function validates if the given number in between the boundaries.
+/// \param number The number to be checked of type int*.
+/// \param bounds The boundaries of type int**. int[0] being the lower boundary and int[1] the upper boundary.
+/// \return True if the number is in between inclusive the boundaries otherwise false.
 int validateIntegerBoundsIncl(const void* number, const void* bounds)
 {
     return *((int*) number) >= ((int*) bounds)[0] && *((int*) number) <= ((int*) bounds)[1];
 }
 
-int validateStringLength(const void* string, const void* length)
+/// This function validates if the length of the given string is under or equals the maxLength.
+/// \param string The string to be check of type char*.
+/// \param maxLength The maximum length of type int*.
+/// \return True if the given string in under or equals the maxLength otherwise false.
+int validateMaxStringLength(const void* string, const void* maxLength)
 {
-    for (int i = 0; i < *((int*) length) + 1; ++i)
+    for (int i = 0; i < *((int*) maxLength) + 1; ++i)
     {
         if (((char*) string)[i] == '\0')
         {
@@ -91,6 +96,10 @@ int validateStringLength(const void* string, const void* length)
     return 0;
 }
 
+/// This function gets the user input and validates it until the user has given a valid input. Creates memory on the heap.
+/// \param params The input parameters.
+/// \param validate The validation function for the input.
+/// \return The validated user input.
 void* getUserInputWithValidation(const userInputParams params, int validate(const void*, const void*))
 {
     void* memory = malloc(params.memSize);
@@ -108,14 +117,20 @@ void* getUserInputWithValidation(const userInputParams params, int validate(cons
     }
 }
 
+/// This function get the size of a list.
+/// \param list The address of the first node of the list.
+/// \return The size of the list.
 int getListSize(node* list)
 {
     int size = 0;
-    for (node* iterator = list; iterator != NULL; iterator = iterator->next, ++size);
+    for (node* iterator = list; iterator != NULL; iterator = iterator->next, size++);
 
     return size;
 }
 
+/// This function converts a list into an array of the list nodes.
+/// \param list The address of the first node of the list.
+/// \return An array with the list nodes of the size of the list.
 node** listToArray(node* list)
 {
     node** arr = malloc(sizeof(node*) * getListSize(list));
@@ -129,6 +144,9 @@ node** listToArray(node* list)
     return arr;
 }
 
+/// This function creates a list node.
+/// \param item The address of the list item.
+/// \return The address of the list node on the heap.
 node* createNode(void* item)
 {
     node* newNode = (node*) malloc(sizeof(node));
@@ -138,24 +156,34 @@ node* createNode(void* item)
     return newNode;
 }
 
+/// This functions frees a node and it's item from the heap.
+/// \param node The address of the list node.
+/// \param freeItem The function to free the node item.
 void freeNode(node* node, void freeItem(void*))
 {
     freeItem(node->item);
     free(node);
 }
 
+/// This function frees a book from the heap.
+/// \param book The address of the book.
 void freeBook(void* book)
 {
     free(((struct book*) book)->title);
     free(book);
 }
 
+/// This function frees a borrowed book for the heap.
+/// \param borrowedBook The address of the borrowed book.
 void freeBorrowedBook(void* borrowedBook)
 {
     free(((struct borrowedBook*) borrowedBook)->borrower);
     free(borrowedBook);
 }
 
+/// This function frees an entire list and its items.
+/// \param list The address of the first list node.
+/// \param freeItem The function to free the node item.
 void freeList(node* list, void freeItem(void*))
 {
     if (list == NULL)
@@ -167,6 +195,10 @@ void freeList(node* list, void freeItem(void*))
     freeNode(list, freeItem);
 }
 
+/// This function adds an item to a list.
+/// \param item The address of the item.
+/// \param list The address of the first node of the list
+/// \return The address of the first node of the list.
 node* addItemToList(void* item, node* list)
 {
     node* newNode = createNode(item);
@@ -179,6 +211,10 @@ node* addItemToList(void* item, node* list)
     return newNode;
 }
 
+/// This function returns the node at the given index.
+/// \param index The index of the node.
+/// \param list The address of the first node of the list.
+/// \return The the address of the node at the index otherwise NULL.
 node* getNodeWithIndex(int index, node* list)
 {
     for (node* iterator = list; iterator != NULL; iterator = iterator->next, index--)
@@ -192,7 +228,12 @@ node* getNodeWithIndex(int index, node* list)
     return NULL;
 }
 
-node* removeItemFromListAtIndex(int index, node* list, void freeItem(void*))
+/// This function removes a node at the index and frees it from the heap.
+/// \param index The index of the node.
+/// \param list The address of the first node of the list.
+/// \param freeItem The function to free the item.
+/// \return The address of the first node of the list.
+node* removeNodeFromListAtIndex(int index, node* list, void freeItem(void*))
 {
     if (index == 0)
     {
@@ -211,6 +252,9 @@ node* removeItemFromListAtIndex(int index, node* list, void freeItem(void*))
     return list;
 }
 
+/// This function prints the list and its items.
+/// \param list The address of the first node of the list.
+/// \param printItem The function to print the list item.
 void printList(node* list, void printItem(const void*))
 {
     int i = 1;
@@ -223,11 +267,19 @@ void printList(node* list, void printItem(const void*))
     printf("\n");
 }
 
-int bookComparator(const void* a, const void* b)
+/// This function compares the year of two books.
+/// \param a The first book of type node**.
+/// \param b The second book of type node**.
+/// \return 1 if the year of the first book is bigger, -1 if the year of the second book is bigger and 0 if both years a equal.
+int bookYearComparator(const void* a, const void* b)
 {
     return ((book*) ((*(node**) a)->item))->year - ((book*) ((*(node**) b)->item))->year;
 }
 
+/// This function prints a list sorted.
+/// \param list The address of the first node of the list.
+/// \param comparator The function to compare two list items.
+/// \param printItem The function to print the list item.
 void printListInOrder(node* list, int comparator(const void*, const void*), void printItem(const void*))
 {
     node** listAsArray = listToArray(list);
@@ -243,6 +295,8 @@ void printListInOrder(node* list, int comparator(const void*, const void*), void
     free(listAsArray);
 }
 
+/// This function prints the data of a book.
+/// \param item The book of type book*.
 void printBook(const void* item)
 {
     printf("%s, %s (%d)",
@@ -252,6 +306,8 @@ void printBook(const void* item)
     );
 }
 
+/// This function prints the data of a borrowed book.
+/// \param item The borrowed book of type borrowedBook*.
 void printBorrowedBook(const void* item)
 {
     printf("%s geliehen von %s",
@@ -260,6 +316,8 @@ void printBorrowedBook(const void* item)
     );
 }
 
+/// This function creates a book and fills it with data.
+/// \return The address of the book on the heap.
 book* createBook()
 {
     book* newBook = (book*) malloc(sizeof(book));
@@ -271,7 +329,7 @@ book* createBook()
                     MAX_TITLE_LENGTH + 1,
                     (int[]) {MAX_TITLE_LENGTH}
             },
-            validateStringLength
+            validateMaxStringLength
     );
 
     int* genre = getUserInputWithValidation(
@@ -313,11 +371,17 @@ book* createBook()
     return newBook;
 }
 
+/// This function inserts a new Book into the inventory
+/// \param inventory The address of the address of the first node of the inventory.
 void insertBook(node** inventory)
 {
     *inventory = addItemToList(createBook(), *inventory);
 }
 
+/// This function creates a borrowed book on the heap.
+/// \param book The address of the book.
+/// \param name The name of the borrower.
+/// \return The address of the borrowed book on the heap.
 borrowedBook* createBorrowedBook(book* book, char* name)
 {
     borrowedBook* newBorrowedBook = (borrowedBook*) malloc(sizeof(borrowedBook));
@@ -326,8 +390,12 @@ borrowedBook* createBorrowedBook(book* book, char* name)
     return newBorrowedBook;
 }
 
-//TODO clean up
-int isBorrower(char* name, book* book, node* borrowedBooks)
+/// This function checks if the given name has already borrowed the given book.
+/// \param name The name of the borrower.
+/// \param book The address of the book.
+/// \param borrowedBooks The address of the first node of the borrowedBooks.
+/// \return True if the name has already borrowed the book otherwise false.
+int isBorrowerOfBook(char* name, book* book, node* borrowedBooks)
 {
     for (node* iterator = borrowedBooks; iterator != NULL; iterator = iterator->next)
     {
@@ -339,6 +407,9 @@ int isBorrower(char* name, book* book, node* borrowedBooks)
     return 0;
 }
 
+/// This function asks which book the user want's to borrow and updates the inventory and the borrowed book accordingly.
+/// \param inventory The address of the first node of the inventory.
+/// \param borrowedBooks The address of the address of the first node of the borrowedBooks.
 void borrowBook(node* inventory, node** borrowedBooks)
 {
     printList(inventory, printBook);
@@ -372,10 +443,10 @@ void borrowBook(node* inventory, node** borrowedBooks)
                     MAX_TITLE_LENGTH + 1,
                     (int[]) {MAX_TITLE_LENGTH}
             },
-            validateStringLength
+            validateMaxStringLength
     );
 
-    if (isBorrower(name, book, *borrowedBooks))
+    if (isBorrowerOfBook(name, book, *borrowedBooks))
     {
         printf("\nSie haben diesen Titel bereits ausgeliehen!");
         return;
@@ -391,6 +462,8 @@ void borrowBook(node* inventory, node** borrowedBooks)
     book->amount--;
 }
 
+/// This function asks which borrowed book the user wants to return.
+/// \param borrowedBooks The address of the address of the first node of the borrowedBooks.
 void returnBook(node** borrowedBooks)
 {
     printList(*borrowedBooks, printBorrowedBook);
@@ -413,11 +486,12 @@ void returnBook(node** borrowedBooks)
     );
 
     ((borrowedBook*) getNodeWithIndex(*index - 1, *borrowedBooks)->item)->book->amount++;
-    *borrowedBooks = removeItemFromListAtIndex(*index - 1, *borrowedBooks, freeBorrowedBook);
+    *borrowedBooks = removeNodeFromListAtIndex(*index - 1, *borrowedBooks, freeBorrowedBook);
 
     free(index);
 }
 
+/// An enum holding all the possible menu actions.
 enum menuAction
 {
     INSERT_BOOK = 'n',
@@ -428,6 +502,9 @@ enum menuAction
     EXIT_PROGRAM = 'x'
 } typedef menuAction;
 
+/// This function asks which menu action the user wants to perform and does so accordingly.
+/// \param inventory The address of the first node of the inventory.
+/// \param borrowedBooks The address of the first node of the borrowedBooks.
 void programMenu(node* inventory, node* borrowedBooks)
 {
     void* mem = NULL;
@@ -460,7 +537,7 @@ void programMenu(node* inventory, node* borrowedBooks)
                 printList(inventory, printBook);
                 break;
             case PRINT_LIST_IN_ORDER:
-                printListInOrder(inventory, bookComparator, printBook);
+                printListInOrder(inventory, bookYearComparator, printBook);
                 break;
             case EXIT_PROGRAM:
                 freeList(inventory, freeBook);
@@ -472,6 +549,8 @@ void programMenu(node* inventory, node* borrowedBooks)
     }
 }
 
+/// The main function of the program. Sets the buffer of stdout to 0 for debugging purposes.
+/// \return 0 if the the program exited without an error.
 int main()
 {
     setbuf(stdout, 0);
