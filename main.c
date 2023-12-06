@@ -9,6 +9,7 @@
 //# ICH HABE DEN TEST NICHT GANZ NACH ANGABE GEMACHT #//
 //####################################################//
 
+/// All available genres. The way I handelt them makes this enum obsolete.
 enum genre_type
 {
     HORROR,
@@ -17,12 +18,14 @@ enum genre_type
     NON_FICTION
 } typedef genre_type;
 
+/// A generic node that can hold on type of data pointer and points to the next node.
 struct node
 {
     void* item;
     struct node* next;
 } typedef node;
 
+/// A struct to hold all the books data.
 struct book
 {
     char* title;
@@ -31,12 +34,15 @@ struct book
     int amount;
 } typedef book;
 
+/// A struct to hold all the borrowed books data.
+/// Points to the book that's being borrowed instead of only saving the title for easy access later.
 struct borrowedBook
 {
     book* book;
     char* borrower;
 } typedef borrowedBook;
 
+/// A struct holding all the data that is needed to get input for the user.
 struct userInputParams
 {
     char* inputType;
@@ -46,16 +52,28 @@ struct userInputParams
     void* validationData;
 } typedef userInputParams;
 
+/// This function validates if the given type is in the valid types.
+/// \param [char] type The type to be checked.
+/// \param types The valid types.
+/// \return True if the type is in types otherwise false.
 int validateGenericTypeAsChar(const void* type, const void* types)
 {
     return strchr((char*) types, *((char*) type)) != NULL;
 }
 
+/// This function validates if the give number is bigger than the lower boundary
+/// \param number The number to be checked
+/// \param lowerBound The lower boundary
+/// \return True if the number is bigger than the boundary otherwise false
 int validateIntegerIsAboveLowerBoundExcl(const void* number, const void* lowerBound)
 {
     return *((int*) number) > *((int*) lowerBound);
 }
 
+///
+/// \param number
+/// \param bounds
+/// \return
 int validateIntegerBoundsIncl(const void* number, const void* bounds)
 {
     return *((int*) number) >= ((int*) bounds)[0] && *((int*) number) <= ((int*) bounds)[1];
@@ -456,7 +474,8 @@ void programMenu(node* inventory, node* borrowedBooks)
 
 int main()
 {
-    //setbuf(stdout, 0);
+    setbuf(stdout, 0);
+
     node* inventory = NULL;
     node* borrowedBooks = NULL;
     programMenu(inventory, borrowedBooks);
