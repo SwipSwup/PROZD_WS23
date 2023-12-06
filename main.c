@@ -10,18 +10,20 @@
 //####################################################//
 
 /// An enum holding all available genres.
-enum genre_type
+enum genre
 {
     // The way I handelt genres makes this enum obsolete.
     HORROR,
     ADVENTURE,
     ROMANCE,
     NON_FICTION
-} typedef genre_type;
+} typedef genre;
 
 /// A generic node that can hold on type of data pointer and points to the next node.
 struct node
 {
+    // Since I saved the book and the borrowedBook in a struct it is possible to create a generic node list
+    // and have a void pointer pointing to either a book or a borrowed book
     void* item;
     struct node* next;
 } typedef node;
@@ -30,7 +32,7 @@ struct node
 struct book
 {
     char* title;
-    genre_type genre;
+    genre genre;
     int year;
     int amount;
 } typedef book;
@@ -39,6 +41,9 @@ struct book
 /// Points to the book that's being borrowed instead of only saving the title for easy access later.
 struct borrowedBook
 {
+    // It is better to save a reference to the book instead of only saving the title.
+    // I can access the amount of the book when returning it without having to loop through the inventory
+    // until I find the book with the same title
     book* book;
     char* borrower;
 } typedef borrowedBook;
@@ -46,6 +51,7 @@ struct borrowedBook
 /// A struct holding all the data that is needed to get input for the user.
 struct userInputParams
 {
+    // The sole purpose of this struct is to encapsulate the data needed to get the user data.
     char* inputType;
     char* message;
 
@@ -122,6 +128,7 @@ void* getUserInputWithValidation(const userInputParams params, int validate(cons
 /// \return The size of the list.
 int getListSize(node* list)
 {
+    // It would have been better to save the list size in a separate variable instead of calculating it every time
     int size = 0;
     for (node* iterator = list; iterator != NULL; iterator = iterator->next, size++);
 
@@ -282,6 +289,7 @@ int bookYearComparator(const void* a, const void* b)
 /// \param printItem The function to print the list item.
 void printListInOrder(node* list, int comparator(const void*, const void*), void printItem(const void*))
 {
+    // This is not the most efficient way to sort the list
     node** listAsArray = listToArray(list);
     qsort(listAsArray, getListSize(list), sizeof(node*), comparator);
 
@@ -301,6 +309,8 @@ void printBook(const void* item)
 {
     printf("%s, %s (%d)",
            ((book*) item)->title,
+           // I create an array with the names of the genres in the correct order.
+           // Since the enum genre is just a number I can use it as an index
            (char* []) {"Horror", "Abenteuer", "Romantik", "Sachbuch"}[((book*) item)->genre],
             ((book*) item)->year
     );
@@ -420,6 +430,7 @@ void borrowBook(node* inventory, node** borrowedBooks)
     }
 
     char preparedString[100];
+    // sprintf formats a string like printf does but instead of printing it saves it in a char*.
     sprintf(preparedString, "\nWelchen Titel moechten Sie leihen? (1-%d): ", getListSize(inventory));
 
     int* index = getUserInputWithValidation(
@@ -533,7 +544,6 @@ void programMenu(node* inventory, node* borrowedBooks)
                 returnBook(&borrowedBooks);
                 break;
             case PRINT_LIST:
-                //printf("\nsize: %d", getListSize(inventory));
                 printList(inventory, printBook);
                 break;
             case PRINT_LIST_IN_ORDER:
@@ -553,6 +563,7 @@ void programMenu(node* inventory, node* borrowedBooks)
 /// \return 0 if the the program exited without an error.
 int main()
 {
+    // This is not necessary, but I needed it because I had problems with clion not printing text while in debug mode.
     setbuf(stdout, 0);
 
     node* inventory = NULL;
