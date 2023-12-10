@@ -330,7 +330,7 @@ book* createBook()
     // But code runner doesn't detect it, and I am to lazy to write a different function for it.
     newBook->title = (char*) getUserInputWithValidation(
             (userInputParams) {
-                    "%s",
+                    "%32s",
                     "\nGeben Sie den Titel ein: ",
                     MAX_TITLE_LENGTH + 1,
                     (int[]) {MAX_TITLE_LENGTH}
@@ -469,7 +469,7 @@ void borrowBook(node* inventory, node** borrowedBooks)
 
     char* name = (char*) getUserInputWithValidation(
             (userInputParams) {
-                    "%s",
+                    "%32s",
                     "\nGeben Sie Ihren Namen ein: ",
                     MAX_TITLE_LENGTH + 1,
                     (int[]) {MAX_TITLE_LENGTH}
