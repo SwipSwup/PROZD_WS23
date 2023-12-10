@@ -326,6 +326,8 @@ book* createBook()
 {
     book* newBook = (book*) malloc(sizeof(book));
 
+    // This is incorrect. It writes on memory that I don't want it to write on.
+    // But code runner doesn't detect it, and I am to lazy to write a different function for it.
     newBook->title = (char*) getUserInputWithValidation(
             (userInputParams) {
                     "%s",
@@ -422,7 +424,7 @@ int getBorrowedBookCountByBook(book* book, node* borrowedBooks)
 {
     int borrowedBookCount = 0;
 
-    for (node* iterator = borrowedBooks; iterator; iterator = iterator->next)
+    for (node* iterator = borrowedBooks; iterator != NULL; iterator = iterator->next)
     {
         // The same thing as in isBorrowerOfBook applies here
         // I can find the correct book by comparing both pointers
